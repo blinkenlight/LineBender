@@ -1,0 +1,28 @@
+*Line Bender* is a complementary utility for the "Line Grinder" PCB isolation milling software, which - as incredibly useful as it is - has been found (as of version 01.04) to occasionally produce g-code containing arcs with slightly different endpoint-to-center radius than their startpoint-to-center one. Whenever this difference exceeds a certain limit, other software trying to execute the resulting g-code may report an error (as per the relevant NIST standard) and refuse execution. 
+
+*Line Bender* aims to provide a way out of such an impasse by taking the flawed g-code as input and producing an output file with all arc center points recalculated to fit within the mentioned tolerance - hopefully as close to the ideal value as possible.
+
+*Usage:*
+linebend.py <input file> [<output file>]
+
+*History:*
+0.1 - Initial release
+
+*Notes:*
+    - While quite functional, this is *alpha level software* born out of necessity, which may or may not introduce undesired changes to the original g-code. Only the simplest g-code is expected to be converted correctly, no attempt has been made to handle all legal cases correctly. Even though it might work just fine for other g-code too, this is an emergency band-aid for "Line Grinder" produced code, not an universal, tested, reliable tool. Please verify the result with a diff tool and/or a g-code simulator before trying to execute it and of course generally *use this at your own risk*.
+    - In particular, some of the assumptions made regarding the input g-code as of v.0.1 include (but are not limited to):
+        - There is no more than one instance of a particular G-word per line (no "G0 X0 Y0 G1 X2 Y2 X3 Y3" etc.)
+        - The first G-word is not an arc (G2/G3) but a G0 or G1
+        - Switching between coordinate systems is not supported (X/Y/Z is tracked in a single common one)
+        - Coordinates are always absolute, and there's no absolute/relative mode switching in the code
+        - There's no imperial/metric unit switching in the code (currently assuming imperial, but metric should work fine too since the numbers are dimensionless anyway)
+        - There's no plane switching in the code and only the default XY work plane is used
+        - All arcs use the I/J relative center mode
+    - Original comments on arc lines are not preserved (replaced by *Line Bender* comments)
+    - Full-circle arcs are not recalculated, considering that:
+        - It's impossible to recalculate the center of an arc based on its endpoints and radius if the endpoints are the same; there are an infinity of full circles fitting those conditions.
+        - By definition, such an arc cannot be invalid - there cannot be a radius difference between them if the two points are the same - therefore there's no need to recalculate it anyway.
+
+This software is released under the terms of the MIT license, also included in the source code.    
+
+*Disclaimer*: _The author of "Line Bender" is not in any way connected to and cannot offer support for the above-mentioned "Line Grinder" software._
